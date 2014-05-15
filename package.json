@@ -1,9 +1,11 @@
 {
   "name": "livescript-compile",
   "main": "./lib/livescript-compile",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "LiveScript preview/save compiled Javascript in Atom",
-  "activationEvents": ["livescript-compile:compile"],
+  "activationEvents": [
+    "livescript-compile:compile"
+  ],
   "repository": "https://github.com/yhsiang/atom-livescript-compile",
   "license": "MIT",
   "engines": {

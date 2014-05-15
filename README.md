@@ -2,7 +2,7 @@
 
 Livescript preview/save compiled Javascript in Atom
 inspired by [coffee-compile](https://github.com/adrianlee44/atom-coffee-compile)
-- `alt+shift+l` Compiles livescript
+- `alt+shift+l` Compiles LiveScript
 
 ![](https://raw.githubusercontent.com/yhsiang/atom-livescript-compile/master/screenshot.png)
 

@@ -1,0 +1,16 @@
+# See https://atom.io/docs/latest/creating-a-package#menus for more details
+'context-menu':
+  '.overlayer':
+      'Enable livescript-compile': 'livescript-compile:compile'
+
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'Livescript Compile'
+      'submenu': [
+        { 'label': 'Compile', 'command': 'livescript-compile:compile' }
+      ]
+    ]
+  }
+]

@@ -10,5 +10,5 @@ inspired by [coffee-compile](https://github.com/adrianlee44/atom-coffee-compile)
 - Add tests
 
 ## Changelog
-- 2014-05-15   v0.1.1   Fixed README typo
+- 2014-05-15   v0.1.1   Fixed README typo
 - 2014-05-15   v0.1.0   Initial Release

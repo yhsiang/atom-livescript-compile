@@ -31,7 +31,6 @@ module.exports =
     return unless editor?
 
     grammars = atom.config.get('livescript-compile.grammars') or []
-    console.log editor.getGrammar().scopeName
     unless (grammar = editor.getGrammar().scopeName) in grammars
       console.warn("Cannot compile non-LiveScript to Javascript")
       return

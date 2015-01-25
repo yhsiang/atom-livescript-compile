@@ -1,7 +1,7 @@
 {
   "name": "livescript-compile",
   "main": "./lib/livescript-compile",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "LiveScript preview/save compiled Javascript in Atom",
   "activationEvents": [
     "livescript-compile:compile"
@@ -12,7 +12,7 @@
     "atom": ">0.50.0"
   },
   "dependencies": {
-    "LiveScript": "^1.2.x",
+    "LiveScript": ">=1.3.x",
     "underscore-plus": "1.x",
     "loophole": "1.0.0"
   },

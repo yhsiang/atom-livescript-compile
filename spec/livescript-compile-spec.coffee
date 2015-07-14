@@ -14,7 +14,8 @@ describe "LivescriptCompile", ->
 
     jasmine.unspy window, "setTimeout"
 
-    atom.workspaceView = new WorkspaceView
+    workspaceElement = atom.views.getView(atom.workspace)
+    atom.workspaceView = workspaceElement
     atom.workspace     = atom.workspaceView.model
     spyOn(LivescriptCompileView.prototype, "renderCompiled")
 

@@ -7,8 +7,9 @@ describe "LivescriptCompileView", ->
   editor   = null
 
   beforeEach ->
-    atom.workspaceView = new WorkspaceView
-    atom.workspace = atom.workspaceView.model
+    workspaceElement = atom.views.getView(atom.workspace)
+    atom.workspaceView = workspaceElement
+    atom.workspace     = atom.workspaceView.model
 
     editor = atom.project.openSync('test.ls')
     compiled = new LivescriptCompileView editor.id

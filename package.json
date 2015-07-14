@@ -3,18 +3,20 @@
   "main": "./lib/livescript-compile",
   "version": "0.1.2",
   "description": "LiveScript preview/save compiled Javascript in Atom",
-  "activationEvents": [
-    "livescript-compile:compile"
-  ],
+  "activationCommands": {
+    "atom-text-editor": "livescript-compile:compile"
+  },
   "repository": "https://github.com/yhsiang/atom-livescript-compile",
   "license": "MIT",
   "engines": {
-    "atom": ">0.50.0"
+    "atom": ">=1.0.2"
   },
   "dependencies": {
     "LiveScript": ">=1.3.x",
-    "underscore-plus": "1.x",
-    "loophole": "1.0.0"
+    "atom-space-pen-views": "^2.0.5",
+    "highlights": "^1.2.0",
+    "loophole": "1.0.0",
+    "underscore-plus": "1.x"
   },
   "devDependencies": {
     "wrench": "^1.5.8",

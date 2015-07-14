@@ -1,12 +1,16 @@
-{$, $$$, EditorView, ScrollView} = require 'atom'
+{$, $$$, ScrollView} = require 'atom-space-pen-views'
+{CompositeDisposable} = require 'atom'
 livescript = require 'LiveScript'
 _ = require 'underscore-plus'
 path = require 'path'
 fs = require 'fs'
 {allowUnsafeNewFunction} = require 'loophole'
+Highlights = require 'highlights'
 
 module.exports =
 class  LivescriptCompileView extends ScrollView
+  subscriptions: null
+
   @content: ->
     @div class: 'livescript-compile native-key-bindings', tabindex: -1, =>
       @div class: 'editor editor-colors', =>
@@ -23,18 +27,21 @@ class  LivescriptCompileView extends ScrollView
       @parents('.pane').view()?.destroyItem(this)
 
   destroy: ->
-    @unsubscribe()
+    @subscriptions.dispose()
 
   bindEvents: ->
-    @subscribe atom.syntax, 'grammar-updated', _.debounce((=> @renderCompiled()), 250)
-    @subscribe this, 'core:move-up', => @scrollUp()
-    @subscribe this, 'core:move-down', => @scrollDown()
+    @subscriptions = new CompositeDisposable
+    @subscriptions.disposed = true
+
+    @subscriptions.add this, 'grammar-updated', _.debounce((=> @renderCompiled()), 250)
+    @subscriptions.add this, 'core:move-up', => @scrollUp()
+    @subscriptions.add this, 'core:move-down', => @scrollDown()
 
     if atom.config.get('livescript-compile.compileOnSave')
-      @subscribe @editor.buffer, 'saved', => @saveCompiled()
+      @subscriptions.add @editor.buffer, 'saved', => @saveCompiled()
 
   getEditor: (id) ->
-    for editor in atom.workspace.getEditors()
+    for editor in atom.workspace.getTextEditors()
       return editor if editor.id?.toString() is id.toString()
     return null
 
@@ -78,12 +85,15 @@ class  LivescriptCompileView extends ScrollView
     catch e
       text = e.stack
 
-    grammar = atom.syntax.selectGrammar("hello.js", text)
+    grammar = atom.grammars.selectGrammar("hello.js", text)
     @compiledCode.empty()
 
-    for tokens in grammar.tokenizeLines(text)
-      attributes = class: "line"
-      @compiledCode.append(EditorView.buildLineHtml({tokens, text, attributes}))
+    highlighter = new Highlights()
+    html = highlighter.highlightSync
+      fileContents: text
+      scopeName: 'source.js'
+
+    @compiledCode.append html
 
     # Match editor styles
     @compiledCode.css
@@ -100,5 +110,5 @@ class  LivescriptCompileView extends ScrollView
     else
       "Compiled Javascript"
 
-  getUri:   -> "livescript-compile://editor/#{@editorId}"
-  getPath:  -> @editor.getPath()
+  getURI:   -> "livescript-compile://editor/#{@editorId}"
+getPath:  -> @editor.getPath()

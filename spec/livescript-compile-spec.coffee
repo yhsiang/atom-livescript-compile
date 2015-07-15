@@ -1,91 +1,92 @@
 temp   = require "temp"
 wrench = require "wrench"
 path   = require "path"
+{TextEditor} = require 'atom'
 
 LivescriptCompileView = require '../lib/livescript-compile-view'
-{WorkspaceView} = require 'atom'
 
 describe "LivescriptCompile", ->
   beforeEach ->
     fixturesPath = path.join __dirname, "fixtures"
     tempPath     = temp.mkdirSync "atom"
     wrench.copyDirSyncRecursive fixturesPath, tempPath, forceDelete: true
-    atom.project.setPath tempPath
+    atom.project.setPaths [tempPath]
 
     jasmine.unspy window, "setTimeout"
 
-    workspaceElement = atom.views.getView(atom.workspace)
-    atom.workspaceView = workspaceElement
-    atom.workspace     = atom.workspaceView.model
+    atom.workspaceView = atom.views.getView(atom.workspace)
     spyOn(LivescriptCompileView.prototype, "renderCompiled")
 
-    waitsForPromise ->
-      atom.packages.activatePackage('livescript-compile')
+    jasmine.attachToDOM(atom.workspaceView)
 
-    waitsForPromise ->
+    atom.packages.activatePackage('livescript-compile').then ->
       atom.packages.activatePackage('language-livescript')
-
-    atom.workspaceView.attachToDom()
 
   describe "should open a new pane", ->
     beforeEach ->
-      atom.workspaceView.attachToDom()
+      jasmine.attachToDOM(atom.workspaceView)
 
+      editor = null
       waitsForPromise ->
-        atom.workspace.open "test.ls"
+        atom.workspace.open('test.ls').then (e) ->
+          editor = e
 
       runs ->
-        atom.workspaceView.getActiveView().trigger "livescript-compile:compile"
+        atom.commands.dispatch atom.views.getView(editor), 'livescript-compile:compile'
 
       waitsFor ->
         LivescriptCompileView::renderCompiled.callCount > 0
 
     it "should always split to the right", ->
       runs ->
-        expect(atom.workspaceView.getPanes()).toHaveLength 2
-        [editorPane, compiledPane] = atom.workspaceView.getPanes()
-
-        expect(editorPane.items).toHaveLength 1
-
-        compiled = compiledPane.getActiveItem()
+        expect(atom.workspace.getPaneItems()).toHaveLength 2
 
     it "should have the same instance", ->
       runs ->
-        [editorPane, compiledPane] = atom.workspaceView.getPanes()
-        compiled = compiledPane.getActiveItem()
-
+        [editor, compiled] = atom.workspace.getPaneItems()
+        expect(editor).toBeInstanceOf(TextEditor)
         expect(compiled).toBeInstanceOf(LivescriptCompileView)
 
     it "should have the same path as active pane", ->
       runs ->
-        [editorPane, compiledPane] = atom.workspaceView.getPanes()
-        compiled = compiledPane.getActiveItem()
-
-        expect(compiled.getPath()).toBe atom.workspaceView.getActivePaneItem().getPath()
+        [editor, compiled] = atom.workspace.getPaneItems()
+        expect(compiled.getPath()).toBe atom.workspace.getActivePaneItem().getPath()
 
     it "should focus on compiled pane", ->
       runs ->
-        [editorPane, compiledPane] = atom.workspaceView.getPanes()
-        compiled = compiledPane.getActiveItem()
+        [editor, compiled] = atom.workspace.getPaneItems()
+        expect(compiled).toHaveFocus()
 
-        expect(compiledPane).toHaveFocus()
+  describe "when the focus editor option is true", ->
+    beforeEach ->
+      atom.config.set "livescript-compile.focusEditorAfterCompile", true
+      jasmine.attachToDOM(atom.workspaceView)
 
-    it "should focus editor when option is set", ->
+      editor = null
+      waitsForPromise ->
+        atom.workspace.open("test.ls").then (e) ->
+          editor = e
+
       runs ->
-        atom.config.set "livescript-compile.focusEditorAfterCompile", true
-        [editorPane, compiledPane] = atom.workspaceView.getPanes()
+        atom.commands.dispatch atom.views.getView(editor), 'livescript-compile:compile'
 
-        expect(editorPane).toHaveFocus()
+      waitsFor ->
+        LivescriptCompileView::renderCompiled.callCount > 0
+
+    it "should focus on editor pane", ->
+      runs ->
+        [editor, compiled] = atom.workspace.getPaneItems()
+        expect(atom.views.getView(editor)).toHaveFocus()
 
   describe "when the editor's grammar is not livescript", ->
     it "should not preview compiled js", ->
       atom.config.set "livescript-compile.grammars", []
-      atom.workspaceView.attachToDom()
+      jasmine.attachToDOM(atom.workspaceView)
 
       waitsForPromise ->
         atom.workspace.open "test.ls"
 
       runs ->
         spyOn(atom.workspace, "open").andCallThrough()
-        atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
+        atom.commands.dispatch atom.workspaceView, 'markdown-preview:show'
         expect(atom.workspace.open).not.toHaveBeenCalled()

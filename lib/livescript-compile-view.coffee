@@ -111,4 +111,4 @@ class  LivescriptCompileView extends ScrollView
       "Compiled Javascript"
 
   getURI:   -> "livescript-compile://editor/#{@editorId}"
-getPath:  -> @editor.getPath()
+  getPath:  -> @editor.getPath()

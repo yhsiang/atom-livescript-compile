@@ -1,15 +1,16 @@
 # See https://atom.io/docs/latest/creating-a-package#menus for more details
 'context-menu':
-  '.overlayer':
-      'Enable livescript-compile': 'livescript-compile:compile'
+  'atom-text-editor': [
+    { label: 'Enable livescript-compile', command: 'livescript-compile:compile' }
+  ]
 
-'menu': [
+menu: [
   {
-    'label': 'Packages'
-    'submenu': [
-      'label': 'Livescript Compile'
-      'submenu': [
-        { 'label': 'Compile', 'command': 'livescript-compile:compile' }
+    label: 'Packages'
+    submenu: [
+      label: 'Livescript Compile'
+      submenu: [
+        { label: 'Compile', command: 'livescript-compile:compile' }
       ]
     ]
   }

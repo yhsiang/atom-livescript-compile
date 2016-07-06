@@ -1,5 +1,6 @@
 url         = require 'url'
 querystring = require 'querystring'
+{CompositeDisposable} = require 'atom'
 
 LivescriptCompileView = require './livescript-compile-view'
 
@@ -15,9 +16,10 @@ module.exports =
     focusEditorAfterCompile: false
 
   activate: ->
-    atom.workspaceView.command 'livescript-compile:compile', => @display()
+    @subscriptions = new CompositeDisposable
+    @subscriptions.add atom.commands.add 'atom-text-editor', 'livescript-compile:compile': => @display()
 
-    atom.workspace.registerOpener (uriToOpen) ->
+    atom.workspace.addOpener (uriToOpen) ->
       {protocol, host, pathname} = url.parse uriToOpen
       pathname = querystring.unescape(pathname) if pathname
 
@@ -25,7 +27,7 @@ module.exports =
       new LivescriptCompileView(pathname.substr(1))
 
   display: ->
-    editor     = atom.workspace.getActiveEditor()
+    editor     = atom.workspace.getActiveTextEditor()
     activePane = atom.workspace.getActivePane()
 
     return unless editor?
@@ -38,11 +40,11 @@ module.exports =
     uri = "livescript-compile://editor/#{editor.id}"
 
     # If a pane with the uri
-    pane = atom.workspace.paneContainer.paneForUri uri
+    pane = atom.workspace.paneForURI uri
     # If not, always split right
     pane ?= activePane.splitRight()
 
-    atom.workspace.openUriInPane(uri, pane, {}).done (livescriptCompileView) ->
+    atom.workspace.openURIInPane(uri, pane, {}).done (livescriptCompileView) ->
       if livescriptCompileView instanceof LivescriptCompileView
         livescriptCompileView.renderCompiled()
 

@@ -1,5 +1,4 @@
 LivescriptCompileView = require '../lib/livescript-compile-view'
-{WorkspaceView} = require 'atom'
 fs = require 'fs'
 
 describe "LivescriptCompileView", ->
@@ -7,11 +6,12 @@ describe "LivescriptCompileView", ->
   editor   = null
 
   beforeEach ->
-    atom.workspaceView = new WorkspaceView
-    atom.workspace = atom.workspaceView.model
+    atom.workspaceView = atom.views.getView(atom.workspace)
 
-    editor = atom.project.openSync('test.ls')
-    compiled = new LivescriptCompileView editor.id
+    waitsForPromise ->
+      atom.workspace.open('test.ls').then (e) ->
+        editor = e
+        compiled = new LivescriptCompileView editor.id
 
     waitsForPromise ->
       atom.packages.activatePackage('language-livescript')
